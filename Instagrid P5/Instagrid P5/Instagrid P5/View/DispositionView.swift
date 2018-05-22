@@ -10,11 +10,28 @@ import UIKit
 
 class DispositionView: UIView {
 
-    @IBOutlet weak var square2: UIView!
-    @IBOutlet weak var square4: UIView!
+    // IBOutlet for the UIView, UIImageView and the buttons
     
-    @IBOutlet weak var imageView1: UIImageView!
-    @IBOutlet weak var imageView2: UIImageView!
-    @IBOutlet weak var imageView3: UIImageView!
-    @IBOutlet weak var imageView4: UIImageView!
+    @IBOutlet weak var squareTR: UIView!
+    @IBOutlet weak var squareBR: UIView!
+
+    @IBOutlet var photoImageViews : [UIImageView]!
+    
+    @IBOutlet var plusButtons : [UIButton]!
+    
+    
+    func displayPattern1() {
+        squareTR.isHidden = true
+        squareBR.isHidden = false
+    }
+    
+    func displayPattern2() {
+        squareTR.isHidden = false
+        squareBR.isHidden = true
+    }
+    
+    func displayPattern3() {
+        squareTR.isHidden = false
+        squareBR.isHidden = false
+    }
 }
