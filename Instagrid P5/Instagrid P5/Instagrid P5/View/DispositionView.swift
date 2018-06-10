@@ -20,18 +20,23 @@ class DispositionView: UIView {
     @IBOutlet var plusButtons : [UIButton]!
     
     
-    func displayPattern1() {
+    func displayLeftPattern() {
         squareTR.isHidden = true
         squareBR.isHidden = false
     }
     
-    func displayPattern2() {
+    func displayMiddlePattern() {
         squareTR.isHidden = false
         squareBR.isHidden = true
     }
     
-    func displayPattern3() {
+    func displayRightPattern() {
         squareTR.isHidden = false
         squareBR.isHidden = false
+    }
+    
+    func sortOutletCollections() {
+        photoImageViews.sort(by: {$0.tag < $1.tag})
+        plusButtons.sort(by: {$0.tag < $1.tag})
     }
 }

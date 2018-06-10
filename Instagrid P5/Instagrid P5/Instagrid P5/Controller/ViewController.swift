@@ -14,19 +14,31 @@ class ViewController: UIViewController {
     // IBOutlet:
     
     @IBOutlet weak var dispositionView: DispositionView!
-    
     @IBOutlet var patternButtons: [UIButton]!
+    @IBOutlet weak var stackView: UIStackView!
     
     
     // Var:
     
     let imagePickerController = UIImagePickerController()
     var tag: Int?
+    var swipeGestureRecognizer: UISwipeGestureRecognizer?
+    var imageViewInserted: UIImageView!
+    var tapGestureRecognizer: UITapGestureRecognizer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        dispositionView.displayPattern2()
+        dispositionView.displayMiddlePattern()
         imagePickerControllerBehaviors()
+        swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector (handleShareAction))
+        setUpSwipeDirection()
+        tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector (displayImageSourceMenu(gesture:)))
+        dispositionView.sortOutletCollections()
+    
+        
+        guard let swipeGestureRecognizer = swipeGestureRecognizer else {return}
+        dispositionView.addGestureRecognizer(swipeGestureRecognizer)
+        NotificationCenter.default.addObserver(self, selector: #selector (setUpSwipeDirection), name: .UIDeviceOrientationDidChange, object: nil)
     }
     
     // IBAction to select the 3 patterns available on the app.
@@ -37,11 +49,11 @@ class ViewController: UIViewController {
         
         switch sender.tag {
         case 0:
-            dispositionView.displayPattern1()
+            dispositionView.displayLeftPattern()
         case 1:
-            dispositionView.displayPattern2()
+            dispositionView.displayMiddlePattern()
         case 2:
-            dispositionView.displayPattern3()
+            dispositionView.displayRightPattern()
         default:
             break
         }
@@ -59,7 +71,7 @@ class ViewController: UIViewController {
     @IBAction func choosePicture(_ sender: UIButton) {
         
         tag = sender.tag
-        displayImageSourceMenu()
+        showImageSourceMenu()
     }
     
     func imagePickerControllerBehaviors() {
@@ -67,7 +79,14 @@ class ViewController: UIViewController {
         imagePickerController.delegate = self
     }
     
-    func displayImageSourceMenu() {
+    @objc func displayImageSourceMenu(gesture: UITapGestureRecognizer) {
+        
+        tag = gesture.view?.tag
+        
+        showImageSourceMenu()
+    }
+    
+    func showImageSourceMenu() {
         
         let actionSheet = UIAlertController(title: "Photo Source", message: "Select a source", preferredStyle: .actionSheet)
         
@@ -76,7 +95,7 @@ class ViewController: UIViewController {
             if UIImagePickerController.isSourceTypeAvailable(.camera) {
                 self.imagePickerController.sourceType = .camera
             } else {
-                self.createAlertCamera(titleText: "Oops...", messageText: "Sorry, the camera is not available on your device.")
+                self.createAlert(titleText: "Oops...", messageText: "Sorry, the camera is not available on your device.")
             }
             self.present(self.imagePickerController, animated: true, completion: nil)
         }))
@@ -92,43 +111,64 @@ class ViewController: UIViewController {
     
     // Func to create the alert on the camera, if it's not avaiable or not working:
     
-    func createAlertCamera(titleText: String,messageText: String){
+    func createAlert(titleText: String,messageText: String){
         
         let cameraAlert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
         
         cameraAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
             
-            cameraAlert.dismiss(animated: true, completion: nil)
+        cameraAlert.dismiss(animated: true, completion: nil)
         }))
         
         self.present(cameraAlert, animated: true, completion: nil)
     }
     
-    // IBAction that allows use the swipe option + UIActivtyController to share:
-
-    @IBAction func swipeToShareOption(_ sender: Any) {
-    
-        let activityController = UIActivityViewController(activityItems: [UIImagePickerControllerOriginalImage, dispositionView], applicationActivities: nil)
-        present(activityController, animated: true, completion: nil)
+    @objc func handleShareAction() {
+        
+        if swipeGestureRecognizer?.direction == .up {
+            UIView.animate(withDuration: 0.8) {
+                self.stackView.transform = CGAffineTransform(translationX:0, y: -self.view.frame.height)
+                self.dispositionView.transform = CGAffineTransform(translationX: 0, y: -self.view.frame.height)
+                self.showActivityController()
+            }
+        } else {
+            UIView.animate(withDuration: 0.8) {
+                self.stackView.transform = CGAffineTransform(translationX: -self.view.frame.width, y: 0)
+                self.dispositionView.transform = CGAffineTransform(translationX: -self.view.frame.width, y: 0)
+                self.showActivityController()
+            }
         }
+    }
+    
+    @objc func setUpSwipeDirection() {
+        
+        if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
+            swipeGestureRecognizer?.direction = .left
+        } else {
+            swipeGestureRecognizer?.direction = .up
+        }
+    }
 
-//            let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction(swipe:)))
-//            swipeUp.direction = UISwipeGestureRecognizerDirection.up
-//            self.view.addGestureRecognizer(swipeUp)
-//
-//    @objc func swipeAction(swipe:UISwipeGestureRecognizer) {
-//
-//    switch swipe.direction.rawValue {
-//    case 0:
-//        print("test")
-//    case 1:
-//        print("test2")
-//    default:
-//        break
-//    }
-//    }
+    func originalPositionDispositionView() {
+        
+        UIView.animate(withDuration: 0.8) {
+        self.stackView.transform = .identity
+        self.dispositionView.transform = .identity
+        }
+    }
+    
+    func showActivityController() {
+        
+        let picturesToShare = [UIImagePickerControllerOriginalImage]
+        
+        let activityController = UIActivityViewController(activityItems: picturesToShare, applicationActivities: nil)
+        present(activityController, animated: true, completion: nil)
+        
+        activityController.completionWithItemsHandler = { activity, completed, items, error in
+            self.originalPositionDispositionView()
+        }
+    }
 }
-
 
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -139,8 +179,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         
         dispositionView.photoImageViews[tag].image = picturePicked
         dispositionView.plusButtons[tag].isHidden = true
-        
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(modifyPicturePicked(_:)))
+        guard let tapGestureRecognizer = tapGestureRecognizer else {return}
         dispositionView.photoImageViews[tag].addGestureRecognizer(tapGestureRecognizer)
         
         picker.dismiss(animated: true, completion: nil)
@@ -148,9 +187,5 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func modifyPicturePicked(_ sender: UITapGestureRecognizer) {
-        displayImageSourceMenu()
     }
 }
