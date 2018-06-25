@@ -11,39 +11,42 @@ import UIKit
 class ViewController: UIViewController {
     
     
-    // IBOutlet:
-    
+    /**
+     IBOutlet:
+    */
     @IBOutlet weak var dispositionView: DispositionView!
     @IBOutlet var patternButtons: [UIButton]!
     @IBOutlet weak var stackView: UIStackView!
     
-    
-    // Var:
+    /**
+     Var:
+    */
     
     let imagePickerController = UIImagePickerController()
     var tag: Int?
     var swipeGestureRecognizer: UISwipeGestureRecognizer?
     var imageViewInserted: UIImageView!
-    var tapGestureRecognizer: UITapGestureRecognizer?
+   
+    /**
+     viewDidLoad:
+    */
     
     override func viewDidLoad() {
         super.viewDidLoad()
         dispositionView.displayMiddlePattern()
         imagePickerControllerBehaviors()
-        swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector (handleShareAction))
         setUpSwipeDirection()
-        tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector (displayImageSourceMenu(gesture:)))
         dispositionView.sortOutletCollections()
+        setBehaviors()
     
         
-        guard let swipeGestureRecognizer = swipeGestureRecognizer else {return}
-        dispositionView.addGestureRecognizer(swipeGestureRecognizer)
-        NotificationCenter.default.addObserver(self, selector: #selector (setUpSwipeDirection), name: .UIDeviceOrientationDidChange, object: nil)
     }
     
-    // IBAction to select the 3 patterns available on the app.
+    /**
+     IBAction to select the 3 patterns available on the app:
+    */
     
-    @IBAction func patternButton(_ sender: UIButton) {
+    @IBAction private func patternButton(_ sender: UIButton) {
         unselectPatternButtons()
         patternButtons[sender.tag].isSelected = true
         
@@ -59,34 +62,61 @@ class ViewController: UIViewController {
         }
     }
     
-    func unselectPatternButtons() {
+    /**
+     Func that allows only select one pattern:
+    */
+    
+    private func unselectPatternButtons() {
         
         patternButtons.forEach { (button) in
             button.isSelected = false
         }
     }
 
-    // Func to select the camera or the photo library:
+    /**
+     Func to select the camera or the photo library:
+    */
     
-    @IBAction func choosePicture(_ sender: UIButton) {
+    @IBAction private func choosePicture(_ sender: UIButton) {
         
         tag = sender.tag
         showImageSourceMenu()
     }
     
-    func imagePickerControllerBehaviors() {
+    
+    private func setBehaviors() {
+        
+        swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector (handleShareAction))
+        
+        guard let swipeGestureRecognizer = swipeGestureRecognizer else {return}
+        dispositionView.addGestureRecognizer(swipeGestureRecognizer)
+        NotificationCenter.default.addObserver(self, selector: #selector (setUpSwipeDirection), name: .UIDeviceOrientationDidChange, object: nil)
+    }
+    
+    /**
+     Adding the Delegate to the imagePickerController:
+     */
+    
+    private func imagePickerControllerBehaviors() {
         
         imagePickerController.delegate = self
     }
     
-    @objc func displayImageSourceMenu(gesture: UITapGestureRecognizer) {
+    /**
+     Func that permit add the tapGesture on the images choosen by the user
+     */
+    
+    @objc private func displayImageSourceMenu(gesture: UITapGestureRecognizer) {
         
         tag = gesture.view?.tag
-        
         showImageSourceMenu()
     }
     
-    func showImageSourceMenu() {
+    /**
+    Method that give the possibility to the user to choose the source of the picture that he wants to add:
+    */
+    
+    @objc private func showImageSourceMenu() {
         
         let actionSheet = UIAlertController(title: "Photo Source", message: "Select a source", preferredStyle: .actionSheet)
         
@@ -109,21 +139,27 @@ class ViewController: UIViewController {
         self.present(actionSheet, animated: true, completion: nil)
     }
     
-    // Func to create the alert on the camera, if it's not avaiable or not working:
+    /**
+    Func to create the alert on the camera, if it's not avaiable or not working:
+    */
     
-    func createAlert(titleText: String,messageText: String){
+    private func createAlert(titleText: String,messageText: String){
         
         let cameraAlert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
         
         cameraAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
             
-        cameraAlert.dismiss(animated: true, completion: nil)
+            cameraAlert.dismiss(animated: true, completion: nil)
         }))
         
         self.present(cameraAlert, animated: true, completion: nil)
     }
     
-    @objc func handleShareAction() {
+    /**
+    Animation to move the dispositionView and the stackView when it shared:
+    */
+    
+    @objc private func handleShareAction() {
         
         if swipeGestureRecognizer?.direction == .up {
             UIView.animate(withDuration: 0.8) {
@@ -140,7 +176,11 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func setUpSwipeDirection() {
+    /**
+    Configure the direction when the device is in landscape mode:
+    */
+    
+     @objc private func setUpSwipeDirection() {
         
         if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
             swipeGestureRecognizer?.direction = .left
@@ -149,7 +189,11 @@ class ViewController: UIViewController {
         }
     }
 
-    func originalPositionDispositionView() {
+    /**
+    Method to set the dispositionView and the stackView in the original position:
+    */
+    
+    private func originalPositionDispositionView() {
         
         UIView.animate(withDuration: 0.8) {
         self.stackView.transform = .identity
@@ -157,35 +201,49 @@ class ViewController: UIViewController {
         }
     }
     
-    func showActivityController() {
+    /**
+    Method to allow the user share the content/pictures present on the disposition view:
+    */
+    
+     private func showActivityController() {
         
-        let picturesToShare = [UIImagePickerControllerOriginalImage]
-        
-        let activityController = UIActivityViewController(activityItems: picturesToShare, applicationActivities: nil)
-        present(activityController, animated: true, completion: nil)
-        
-        activityController.completionWithItemsHandler = { activity, completed, items, error in
-            self.originalPositionDispositionView()
+        if dispositionView.isAvailableToShare() {
+            guard let pictureToShare = DispositionViewConverter.convertViewToImage(view: dispositionView) else {return}
+            
+            let activityController = UIActivityViewController(activityItems: [pictureToShare], applicationActivities: nil)
+            present(activityController, animated: true, completion: nil)
+            
+            activityController.completionWithItemsHandler = { activity, completed, items, error in
+                self.originalPositionDispositionView()
+            }
+        } else {
+            createAlert(titleText: "Caution", messageText: "The grid needs to be completed to share")
+            originalPositionDispositionView()
         }
     }
 }
 
+/**
+ Extension to configure the image picker controller:
+*/
+
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         guard let picturePicked = info[UIImagePickerControllerOriginalImage] as? UIImage else {return}
         
         guard let tag = tag else {return}
         
         dispositionView.photoImageViews[tag].image = picturePicked
         dispositionView.plusButtons[tag].isHidden = true
-        guard let tapGestureRecognizer = tapGestureRecognizer else {return}
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector (displayImageSourceMenu(gesture:)))
         dispositionView.photoImageViews[tag].addGestureRecognizer(tapGestureRecognizer)
         
         picker.dismiss(animated: true, completion: nil)
     }
     
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    internal func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
 }
+

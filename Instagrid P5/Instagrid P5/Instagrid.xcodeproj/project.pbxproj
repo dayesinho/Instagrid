@@ -15,6 +15,7 @@
 		019EFC9C207E616F00165C8A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 019EFC9A207E616F00165C8A /* Main.storyboard */; };
 		019EFC9E207E617000165C8A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 019EFC9D207E617000165C8A /* Assets.xcassets */; };
 		019EFCA1207E617000165C8A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 019EFC9F207E617000165C8A /* LaunchScreen.storyboard */; };
+		01BACE7820CE9E54006B9473 /* DispositionViewConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BACE7720CE9E54006B9473 /* DispositionViewConverter.swift */; };
 		01DB9EB72091F43D00947BB9 /* DispositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DB9EB62091F43D00947BB9 /* DispositionView.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		019EFC9D207E617000165C8A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		019EFCA0207E617000165C8A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		019EFCA2207E617000165C8A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		01BACE7720CE9E54006B9473 /* DispositionViewConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispositionViewConverter.swift; sourceTree = "<group>"; };
 		01DB9EB62091F43D00947BB9 /* DispositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispositionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,6 +84,7 @@
 		01DB9EB2208F855400947BB9 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				01BACE7720CE9E54006B9473 /* DispositionViewConverter.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -190,6 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				019EFC99207E616F00165C8A /* ViewController.swift in Sources */,
+				01BACE7820CE9E54006B9473 /* DispositionViewConverter.swift in Sources */,
 				019EFC97207E616F00165C8A /* AppDelegate.swift in Sources */,
 				01DB9EB72091F43D00947BB9 /* DispositionView.swift in Sources */,
 				0126953A20B2F50C009A979E /* UIImagePickerController.swift in Sources */,
@@ -339,7 +343,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YTYTL62S3W;
 				INFOPLIST_FILE = "$(SRCROOT)/Instagrid P5/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -358,7 +362,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YTYTL62S3W;
 				INFOPLIST_FILE = "$(SRCROOT)/Instagrid P5/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
