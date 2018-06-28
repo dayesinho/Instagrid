@@ -148,10 +148,8 @@ class ViewController: UIViewController {
         let cameraAlert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
         
         cameraAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            
             cameraAlert.dismiss(animated: true, completion: nil)
         }))
-        
         self.present(cameraAlert, animated: true, completion: nil)
     }
     

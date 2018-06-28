@@ -37,6 +37,10 @@ class DispositionView: UIView {
         squareBR.isHidden = false
     }
     
+    /**
+     Method that allows sort the tags of the UIImageViews
+     */
+    
     func sortOutletCollections() {
         photoImageViews.sort(by: {$0.tag < $1.tag})
         plusButtons.sort(by: {$0.tag < $1.tag})
